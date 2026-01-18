@@ -1,0 +1,38 @@
+{
+    "name": "imprint/imprint-php",
+    "description": "Official PHP SDK for Imprint - unified observability platform",
+    "keywords": ["observability", "tracing", "monitoring", "apm", "distributed-tracing"],
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Tedo",
+            "email": "hello@tedo.ai"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.0",
+        "psr/log": "^2.0|^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Imprint\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Imprint\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse src --level=6"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
