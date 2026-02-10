@@ -18,6 +18,7 @@ class Configuration
         public readonly int $batchSize = 100,
         public readonly int $flushInterval = 5, // seconds
         public readonly int $bufferSize = 1000,
+        public readonly float $samplingRate = 1.0, // 0.0 to 1.0
         public readonly array $ignorePaths = [],
         public readonly array $ignorePrefixes = ['/assets/', '/build/'],
         public readonly array $ignoreExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map'],
@@ -29,12 +30,15 @@ class Configuration
      */
     public static function fromEnvironment(): self
     {
+        $samplingRate = getenv('IMPRINT_SAMPLING_RATE');
+
         return new self(
             apiKey: getenv('IMPRINT_API_KEY') ?: '',
             serviceName: getenv('IMPRINT_SERVICE_NAME') ?: 'php-app',
             ingestUrl: getenv('IMPRINT_INGEST_URL') ?: 'https://api.imprint.cloud/v1/spans',
             enabled: getenv('IMPRINT_ENABLED') !== 'false',
             debug: getenv('IMPRINT_DEBUG') === 'true',
+            samplingRate: $samplingRate !== false ? (float) $samplingRate : 1.0,
             jobNamespace: getenv('IMPRINT_JOB_NAMESPACE') ?: null,
         );
     }
