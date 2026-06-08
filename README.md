@@ -43,7 +43,7 @@ The SDK automatically reads configuration from environment variables:
 ```bash
 IMPRINT_API_KEY=imp_live_xxxxx           # Required: Your API key
 IMPRINT_SERVICE_NAME=my-app              # Service name (default: php-app)
-IMPRINT_INGEST_URL=https://api.imprint.cloud/v1/spans  # Ingest endpoint
+IMPRINT_INGEST_URL=https://ingest.imprint.cloud/v1/spans  # Ingest endpoint
 IMPRINT_ENABLED=true                     # Enable/disable tracing
 IMPRINT_DEBUG=false                      # Enable debug logging
 IMPRINT_SAMPLING_RATE=1.0                # Sample rate (0.0-1.0)
@@ -58,7 +58,7 @@ use Imprint\Imprint;
 $config = new Configuration(
     apiKey: 'imp_live_xxxxx',
     serviceName: 'my-app',
-    ingestUrl: 'https://api.imprint.cloud/v1/spans',
+    ingestUrl: 'https://ingest.imprint.cloud/v1/spans',
     enabled: true,
     debug: false,
     batchSize: 100,
@@ -70,6 +70,9 @@ $config = new Configuration(
 
 Imprint::configure($config);
 ```
+
+Use `https://ingest.imprint.cloud/v1/spans` as the canonical hosted ingest endpoint.
+The legacy `https://api.imprint.cloud/v1/spans` route is still accepted for compatibility, but new PHP integrations should point at the dedicated ingest host.
 
 ## Usage
 
@@ -273,3 +276,14 @@ composer require imprint/imprint-laravel
 ## License
 
 MIT
+
+## Async Export Rule
+
+Imprint SDKs **must not perform HTTP on the caller (request) thread**. Recording
+a span/log/metric is a non-blocking enqueue; reaching `batch_size` signals the
+background worker, which owns all export I/O. Buffer overflow drops (backpressure).
+Synchronous flush is only allowed at shutdown.
+
+**This SDK:** ❌ must fix — currently flushes at batch_size mid-request; defer to after the response via fastcgi_finish_request() + register_shutdown_function.
+
+Full rule + runtime-specific guidance: `imprint-internal/docs/sdk-async-export-rule.md`.
